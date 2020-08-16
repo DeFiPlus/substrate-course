@@ -1,46 +1,28 @@
+use std::path::PathBuf;
 use structopt::StructOpt;
-use std::fmt::{self, Display, Formatter};
+use std::fmt::Display;
+use std::fmt;
 
-#[derive(StructOpt)]
-#[structopt(name = "app")]
-pub struct AppArgs {
-    #[structopt(subcommand)]
-    pub command: Command,
+
+#[derive(Debug, StructOpt)] 
+struct Opts{
+    #[structopt(parse(from_os_str))] 
+    infile: PathBuf, 
+
+    #[structopt(short, long, parse(from_os_str))]
+    outfile: Option<PathBuf>, 
 }
 
-#[derive(StructOpt)]
-pub enum Command {
-    /// add operation
-    #[structopt(name = "add")]
-    Add(Elements),
-
-    /// times operation
-    #[structopt(name = "times")]
-    Times(Elements),
-}
-
-#[derive(StructOpt)]
-pub struct Elements {
-    pub elements: Vec<u32>,
-}
-
-impl Display for Elements {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "[{:#?}]", self.elements)
+impl Display for Opts{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({:?}, {:?})", self.infile, self.outfile)
     }
 }
 
 fn main() {
-    let opt = AppArgs::from_args();
+    let opts = Opts::from_args();
 
-    match opt.command {
-        Command::Add(e) => {
-            let result = e.elements.iter().fold(0, |acc, &x| acc + x);
-            println!("Operants: {}, result: {}", e, result);
-        },
-        Command::Times(e) => {
-            let result = e.elements.iter().fold(1, |acc, &x| acc * x);
-            println!("Operants: {}, result: {}", e, result);
-        },
-    }
+    // use this if not implement Display for Opts  
+    //println!("{:?}", opts);
+    println!("{}", opts);
 }
